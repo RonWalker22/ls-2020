@@ -132,6 +132,7 @@ class TTTGame {
     this.board = new Board();
     this.human = new Human();
     this.computer = new Computer();
+    this.replay = false;
   }
 
   play() {
@@ -150,12 +151,39 @@ class TTTGame {
 
     this.board.displayWithClear();
     this.displayResults();
-    this.displayGoodbyeMessage();
+    if (this.playAgain()) {
+      this.board = new Board();
+      this.replay = true;
+      this.play();
+    } else {
+      this.displayGoodbyeMessage();
+    }
+  }
+
+  playAgain() {
+    let question = 'Would you like to play again?';
+    let choice = this.prompt(question, ['y', 'n', 'Y', 'N']);
+
+    return choice.toLowerCase() === 'y';
+  }
+
+  prompt(message, validChoices) {
+    while (true) {
+      let answer = readline.question(message + ' ');
+
+      if (validChoices.includes(answer)) return answer;
+
+      console.log("Sorry, that's not a valid answer.");
+      console.log("");
+    }
   }
 
   displayWelcomeMessage() {
     console.clear();
-    console.log("Welcome to Tic Tac Toe!");
+    if (!this.replay) {
+      console.log("Welcome to Tic Tac Toe!");
+    }
+    console.log("");
     console.log("");
   }
 
@@ -174,18 +202,9 @@ class TTTGame {
   }
 
   humanMoves() {
-    let choice;
-
-    while (true) {
-      let validChoices = this.board.unusedSquares();
-      const prompt = `Choose a square (${TTTGame.joinOr(validChoices)}):`;
-      choice = readline.question(prompt);
-
-      if (validChoices.includes(choice)) break;
-
-      console.log("Sorry, that's not a valid choice.");
-      console.log("");
-    }
+    let validChoices = this.board.unusedSquares();
+    const chooseMessage = `Choose a square (${TTTGame.joinOr(validChoices)}):`;
+    let choice = this.prompt(chooseMessage, validChoices);
 
     this.board.markSquareAt(choice, this.human.getMarker());
   }
