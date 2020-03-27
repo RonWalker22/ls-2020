@@ -160,6 +160,24 @@ class TTTGame {
     }
   }
 
+  winningThreat() {
+    let winners = [];
+    let threatRow;
+    let human = this.human;
+    let computer = this.computer;
+    let board = this.board;
+    
+    TTTGame.POSSIBLE_WINNING_ROWS.forEach( function(row) {
+      let humanCount = board.countMarkersFor(human, row);
+      let computerCount = board.countMarkersFor(computer, row);
+
+      if (humanCount === 2 && computerCount === 0) {
+        threatRow = row;
+      }
+    })
+   return threatRow;
+  }
+
   playAgain() {
     let question = 'Would you like to play again?';
     let choice = this.prompt(question, ['y', 'n', 'Y', 'N']);
@@ -212,10 +230,17 @@ class TTTGame {
   computerMoves() {
     let validChoices = this.board.unusedSquares();
     let choice;
+    let threatRow = this.winningThreat();
 
-    do {
-      choice = Math.floor((9 * Math.random()) + 1).toString();
-    } while (!validChoices.includes(choice));
+    if (threatRow) {
+      for(let i = 0; i < threatRow.length; i++) {
+        if (validChoices.includes(threatRow[i])) choice = threatRow[i];
+      }
+    } else {
+      do {
+        choice = Math.floor((9 * Math.random()) + 1).toString();
+      } while (!validChoices.includes(choice));
+    }
 
     this.board.markSquareAt(choice, this.computer.getMarker());
   }
