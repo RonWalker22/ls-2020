@@ -160,18 +160,17 @@ class TTTGame {
     }
   }
 
-  winningThreat() {
+  winningThreat(player, opponent) {
+    
     let winners = [];
     let threatRow;
-    let human = this.human;
-    let computer = this.computer;
     let board = this.board;
     
     TTTGame.POSSIBLE_WINNING_ROWS.forEach( function(row) {
-      let humanCount = board.countMarkersFor(human, row);
-      let computerCount = board.countMarkersFor(computer, row);
+      let playerCount = board.countMarkersFor(player, row);
+      let opponentCount = board.countMarkersFor(opponent, row);
 
-      if (humanCount === 2 && computerCount === 0) {
+      if (opponentCount === 2 && playerCount === 0) {
         threatRow = row;
       }
     })
@@ -230,9 +229,14 @@ class TTTGame {
   computerMoves() {
     let validChoices = this.board.unusedSquares();
     let choice;
-    let threatRow = this.winningThreat();
-
-    if (threatRow) {
+    let opportunityRow = this.winningThreat(this.human, this.computer);
+    let threatRow = this.winningThreat(this.computer, this.human);
+    
+    if (opportunityRow) {
+      for(let i = 0; i < opportunityRow.length; i++) {
+        if (validChoices.includes(opportunityRow[i])) choice = opportunityRow[i];
+      }
+    } else if (threatRow) {
       for(let i = 0; i < threatRow.length; i++) {
         if (validChoices.includes(threatRow[i])) choice = threatRow[i];
       }
