@@ -233,13 +233,9 @@ class TTTGame {
     let threatRow = this.winningThreat(this.computer, this.human);
     
     if (opportunityRow) {
-      for(let i = 0; i < opportunityRow.length; i++) {
-        if (validChoices.includes(opportunityRow[i])) choice = opportunityRow[i];
-      }
+      choice = this.strategicSquare(opportunityRow)
     } else if (threatRow) {
-      for(let i = 0; i < threatRow.length; i++) {
-        if (validChoices.includes(threatRow[i])) choice = threatRow[i];
-      }
+      choice = this.strategicSquare(threatRow)
     } else if (validChoices.includes('5')) { 
       choice = '5';
     } else {
@@ -249,6 +245,13 @@ class TTTGame {
     }
 
     this.board.markSquareAt(choice, this.computer.getMarker());
+  }
+
+  strategicSquare(row) {
+    let validChoices = this.board.unusedSquares();
+    for(let i = 0; i < row.length; i++) {
+      if (validChoices.includes(row[i])) return row[i];
+    }
   }
 
   gameOver() {
