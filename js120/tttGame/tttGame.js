@@ -240,6 +240,8 @@ class TTTGame {
       for(let i = 0; i < threatRow.length; i++) {
         if (validChoices.includes(threatRow[i])) choice = threatRow[i];
       }
+    } else if (validChoices.includes('5')) { 
+      choice = '5';
     } else {
       do {
         choice = Math.floor((9 * Math.random()) + 1).toString();
