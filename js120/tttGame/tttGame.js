@@ -133,6 +133,7 @@ class TTTGame {
     this.human = new Human();
     this.computer = new Computer();
     this.replay = false;
+    this.score = {human: 0, computer: 0};
   }
 
   play() {
@@ -141,17 +142,19 @@ class TTTGame {
     this.board.display();
     while (true) {
       this.humanMoves();
-      if (this.gameOver()) break;
+      if (this.endOfRound()) break;
 
       this.computerMoves();
-      if (this.gameOver()) break;
+      if (this.endOfRound()) break;
 
       this.board.displayWithClear();
     }
 
     this.board.displayWithClear();
+    this.updateScore()
     this.displayResults();
-    if (this.playAgain()) {
+
+    if (!this.roundsRemaining() && this.playAgain()) {
       this.board = new Board();
       this.replay = true;
       this.play();
@@ -184,6 +187,10 @@ class TTTGame {
     return choice.toLowerCase() === 'y';
   }
 
+  roundsRemaining() {
+    return Object.values(this.score).some(roundsWon => roundsWon >= 3);
+  }
+
   prompt(message, validChoices) {
     while (true) {
       let answer = readline.question(message + ' ');
@@ -205,16 +212,31 @@ class TTTGame {
   }
 
   displayGoodbyeMessage() {
+    if (this.isGameWinner(this.human)) {
+      console.log("Congratulations, you have won the game!!!!");
+    } else if (this.isGameWinner(this.computer)) {
+      console.log("The computer has won the game.");
+    }
     console.log("Thanks for playing Tic Tac Toe! Goodbye!");
   }
 
   displayResults() {
-    if (this.isWinner(this.human)) {
-      console.log("You won! Congratulations!");
-    } else if (this.isWinner(this.computer)) {
+    if (this.isRoundWinner(this.human)) {
+      console.log("You won this round! Congratulations!");
+    } else if (this.isRoundWinner(this.computer)) {
       console.log("I won! I won! Take that, human!");
     } else {
       console.log("A tie game. How boring.");
+    }
+    console.log('Computer Rounds wins: ' +  this.score.computer)
+    console.log('Your Rounds wins: ' + this.score.human)
+  }
+
+  updateScore() {
+    if (this.isRoundWinner(this.human)) {
+      this.score.human += 1;
+    } else if (this.isRoundWinner(this.computer)) {
+      this.score.computer += 1;
     }
   }
 
@@ -254,18 +276,23 @@ class TTTGame {
     }
   }
 
-  gameOver() {
+  endOfRound() {
     return this.board.isFull() || this.someoneWon();
   }
 
   someoneWon() {
-    return this.isWinner(this.human) || this.isWinner(this.computer);
+    return this.isRoundWinner(this.human) || this.isRoundWinner(this.computer);
   }
 
-  isWinner(player) {
+  isRoundWinner(player) {
     return TTTGame.POSSIBLE_WINNING_ROWS.some(row => {
       return this.board.countMarkersFor(player, row) === 3;
     });
+  }
+
+  isGameWinner(player) {
+    player = player.constructor.name.toLowerCase();
+    return this.score[player] >= 3;
   }
 }
 
