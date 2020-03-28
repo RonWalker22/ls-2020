@@ -134,22 +134,25 @@ class TTTGame {
     this.computer = new Computer();
     this.replay = false;
     this.score = {human: 0, computer: 0};
+    this.firstPlayer = this.human;
+    this.currentPlayer;
   }
 
   play() {
     this.displayWelcomeMessage();
 
     this.board.display();
-    while (true) {
-      this.humanMoves();
-      if (this.endOfRound()) break;
 
-      this.computerMoves();
+    this.setCurrentPlayer();
+    while (true) {
+      this.currentPlayerMoves();
       if (this.endOfRound()) break;
+      this.toggleCurrentPlayer();
 
       this.board.displayWithClear();
     }
 
+    this.toggleFirstPlayer();
     this.board.displayWithClear();
     this.updateScore()
     this.displayResults();
@@ -240,6 +243,30 @@ class TTTGame {
     }
   }
 
+  currentPlayerMoves() {
+    this.currentPlayer === this.human ? this.humanMoves() : this.computerMoves();
+  }
+  
+  toggleCurrentPlayer() { 
+    if (this.currentPlayer === this.human) {
+      return this.currentPlayer = this.computer;
+    } else {
+      return this.currentPlayer = this.human;
+    }
+  }  
+  
+  toggleFirstPlayer() { 
+    if (this.firstPlayer === this.human) {
+      return this.firstPlayer = this.computer;
+    } else {
+      return this.firstPlayer = this.human;
+    }
+  }
+
+  setCurrentPlayer() {
+    this.currentPlayer = this.firstPlayer;
+  }
+  
   humanMoves() {
     let validChoices = this.board.unusedSquares();
     const chooseMessage = `Choose a square (${TTTGame.joinOr(validChoices)}):`;
